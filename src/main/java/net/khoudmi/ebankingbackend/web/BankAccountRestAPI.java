@@ -1,14 +1,10 @@
 package net.khoudmi.ebankingbackend.web;
 
-import net.khoudmi.ebankingbackend.dtos.AccountHistoryDTO;
-import net.khoudmi.ebankingbackend.dtos.AccountOperationDTO;
-import net.khoudmi.ebankingbackend.dtos.BankAccountDTO;
+import net.khoudmi.ebankingbackend.dtos.*;
+import net.khoudmi.ebankingbackend.exceptions.BalanceNotSufficientException;
 import net.khoudmi.ebankingbackend.exceptions.BankAccountNotFoundException;
 import net.khoudmi.ebankingbackend.services.BankAccountService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,5 +38,22 @@ public class BankAccountRestAPI {
         return bankAccountService.getAccountHistory(accountId, page, size);
     }
 
+    @PostMapping("/accounts/debit")
+    public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException, BalanceNotSufficientException {
+        this.bankAccountService.debit(debitDTO.getAccountId(),debitDTO.getAmount(),debitDTO.getDescription());
+        return debitDTO;
+    }
+    @PostMapping("/accounts/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException {
+        this.bankAccountService.credit(creditDTO.getAccountId(),creditDTO.getAmount(),creditDTO.getDescription());
+        return creditDTO;
+    }
+    @PostMapping("/accounts/transfer")
+    public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        this.bankAccountService.transfer(
+                transferRequestDTO.getAccountSource(),
+                transferRequestDTO.getAccountDestination(),
+                transferRequestDTO.getAmount());
+    }
 }
 
